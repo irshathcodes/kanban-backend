@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022", // Modern JavaScript features
+    "module": "NodeNext", // Node JS ES module support
+    "moduleResolution": "NodeNext", // Node JS resolution strategy
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "skipLibCheck": true,
+    "types": ["node"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx",
+    "outDir": "dist",
+    "allowJs": true,
+    "resolveJsonModule": true, // Include JSON modules
+    "verbatimModuleSyntax": true, // This option forces you to use import type and export type, leading to more predictable behavior and fewer unnecessary imports. With module: NodeNext, it also enforces you're using the correct import syntax for ESM or CJS.
+    "moduleDetection": "force",
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true, // Interoperability between CommonJS and ES modules
+    "noImplicitOverride": true, // Makes the override keyword actually useful in classes.
+    "lib": ["es2022"]
+  },
+  "exclude": ["node_modules"]
+}
