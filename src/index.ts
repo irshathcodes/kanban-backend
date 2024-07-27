@@ -4,6 +4,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { logger } from "hono/logger";
 import boardsRouter from "./router/boards.js";
 import { client } from "./db/index.js";
+import authRouter from "./router/auth.js";
 
 export const app = new OpenAPIHono({
   defaultHook: (result, c) => {
@@ -27,6 +28,7 @@ app.get("/", (c) => {
 });
 
 app.route("/", boardsRouter);
+app.route("/", authRouter);
 
 // The OpenAPI documentation will be available at /doc
 app.doc("/doc", {

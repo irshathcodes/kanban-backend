@@ -1,9 +1,7 @@
 import { z } from "@hono/zod-openapi";
 
 const ErrorSchema = z.object({
-  message: z.string().openapi({
-    example: "Bad Request",
-  }),
+  message: z.string().openapi({}),
 });
 
 export const validationErrorSchema = {
@@ -12,5 +10,14 @@ export const validationErrorSchema = {
       schema: ErrorSchema,
     },
   },
-  description: "Retrieve the user",
+  description: "Gives you validation errors",
+};
+
+export const badRequestErrorSchema = {
+  content: {
+    "application/json": {
+      schema: ErrorSchema,
+    },
+  },
+  description: "",
 };
