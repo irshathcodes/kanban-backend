@@ -5,8 +5,9 @@ import { userTable } from "../db/schema.js";
 import { and, eq, or } from "drizzle-orm";
 import { attachAuthCookie, hashPassword, verifyPassword } from "../utils.js";
 import { generateId } from "lucia";
+import type { AppInstanceType } from "../index.js";
 
-const authRouter = new OpenAPIHono();
+const authRouter = new OpenAPIHono<AppInstanceType>();
 
 authRouter.openapi(registerUserRoute, async (c) => {
   const body = await c.req.json();
@@ -40,7 +41,8 @@ authRouter.openapi(registerUserRoute, async (c) => {
     .returning();
 
   const { password, ...rest } = result[0]!;
-  attachAuthCookie(rest!.id, c);
+
+  await attachAuthCookie(rest!.id, c);
 
   return c.json(rest, 200);
 });
@@ -68,7 +70,7 @@ authRouter.openapi(loginUserRoute, async (c) => {
     return c.json({ message: "Invalid credentials" }, 400);
   }
 
-  attachAuthCookie(user.id, c);
+  await attachAuthCookie(user.id, c);
 
   return c.json({ email: user.email, name: user.name }, 200);
 });

@@ -1,8 +1,8 @@
 import { promisify } from "node:util";
 import { randomBytes, scrypt, timingSafeEqual } from "node:crypto";
-import { lucia } from "./lib/auth.js";
+import { lucia } from "./lib/lucia.js";
 import { setCookie } from "hono/cookie";
-import type { Context } from "hono";
+import type { AppContext } from "./index.js";
 
 const scryptPromise = promisify(scrypt);
 
@@ -19,7 +19,7 @@ export async function verifyPassword(password: string, hashedPassword: string) {
   return timingSafeEqual(keyBuffer, derivedKey as Buffer);
 }
 
-export async function attachAuthCookie(userId: string, c: Context) {
+export async function attachAuthCookie(userId: string, c: AppContext) {
   const session = await lucia.createSession(userId, {});
   const sessionCookie = lucia.createSessionCookie(session.id);
 

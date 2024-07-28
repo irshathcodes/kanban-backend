@@ -5,8 +5,26 @@ import { logger } from "hono/logger";
 import boardsRouter from "./router/boards.js";
 import { client } from "./db/index.js";
 import authRouter from "./router/auth.js";
+import { cors } from "hono/cors";
+import { csrf } from "hono/csrf";
+import type { Context } from "hono";
+import {
+  authenticatedMiddleware,
+  verifySessionMiddleware,
+} from "./middlewares/auth.js";
 
-export const app = new OpenAPIHono({
+type Variables = {
+  user: any;
+  session: any;
+};
+
+export type AppInstanceType = {
+  Variables: Variables;
+};
+
+export type AppContext = Context<AppInstanceType>;
+
+export const app = new OpenAPIHono<{ Variables: Variables }>({
   defaultHook: (result, c) => {
     if (result.success) {
       return;
@@ -21,16 +39,28 @@ export const app = new OpenAPIHono({
   },
 });
 
+export type AppInstance = typeof app;
+
+app.use(
+  "/*",
+  cors({
+    // TODO: Change origin later
+    origin: "http://localhost:3001",
+    credentials: true,
+  })
+);
+
+app.use(csrf({ origin: "http://localhost:3001" }));
+
 app.use(logger());
+
+// ====== Public routes goes here ======
 
 app.get("/", (c) => {
   return c.json("hello hono");
 });
 
-app.route("/", boardsRouter);
-app.route("/", authRouter);
-
-// The OpenAPI documentation will be available at /doc
+// The OpenAPI documentation.
 app.doc("/doc", {
   openapi: "3.0.0",
   info: {
@@ -46,6 +76,19 @@ app.get(
     url: "/doc",
   })
 );
+
+app.route("/", authRouter);
+// ====== end of public routes ======
+
+// Verify if the user is logged in, if yes, adds the `user` object to the context.
+app.use("*", verifySessionMiddleware);
+
+// Checks for `user` object in the context, if it is not available returns 401.
+app.use("*", authenticatedMiddleware);
+
+// ====== Protected routes goes here ======
+app.route("/", boardsRouter);
+// ====== End of protected routes ======
 
 const port = 3000;
 
